@@ -8,6 +8,12 @@
     <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- PWA MANIFEST (Base64 Encoded JSON for single-file operation) -->
+    <!-- Content: name=DEMOFM - MATRIX, display=standalone, icons point to placeholders -->
+    <link rel="manifest" href="data:application/json;base64,eyJkZXNjcmlwdGlvbiI6ICJNYXRyaXgvQmF1aGF1cyBBdWRpbyBUZXJtaW5hbC4iLCAiaWNvbnMiOiBbeyJzaXplcyI6ICIxOTJ4MTkyIiwgInNyYyI6ICJodHRwczovL3BsYWNlaG9sZC5jby8xOTJ4MTkyLzAwMDAwMC8wMGZmMDA/dGV4dD1EIEYiLCAidHlwZSI6ICJpbWFnZS9wbmciIH0sIHsic2l6ZXMiOiAiNTEyeDUxMiIsICJzcmMiOiAiaHR0cHM6Ly9wbGFjZWhvb mote C/NTEyeDUxMi8wMDAwMDAvMDBmZjAwP3RleHQ9RCBGIE0iLCAidHlwZSI6ICJpbWFnZS9wbmciIH1dLCAibmFtZSI6ICJERU1PRk0gLSBNQVRSSVgiLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgInN0YXJ0X3VybCI6ICIuLyIsICJzaG9ydF9uYW1lIjogIkRFTU9GTSIsICJ0aGVtZV9jb2xvciI6ICIjMDAwMDAwIiwgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCJ9">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/000000/00ff00?text=D+F">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://w.soundcloud.com/player/api.js"></script>
@@ -158,7 +164,7 @@
                     <h1 class="text-3xl font-black tracking-tighter leading-none text-red-500">
                         <span style="color: var(--fg);">DEMO</span>FM
                     </h1>
-                    <p class="text-xs mt-1">V6.0 // ONLINE</p>
+                    <p class="text-xs mt-1">V6.2 // ONLINE</p>
                 </div>
                 <!-- Status indicator -->
                 <div id="connection-dot" class="status-dot"></div>
@@ -191,8 +197,9 @@
 
                 <!-- Volume -->
                 <div class="flex items-center gap-3 mt-2">
-                    <span class="text-xs w-1/5">VOLUME</span>
-                    <input type="range" min="0" max="100" value="70" class="flex-1" oninput="setVolume(this.value)">
+                    <!-- ADDED UI FEEDBACK SPAN FOR VOLUME PERCENTAGE -->
+                    <span class="text-xs w-1/5">VOLUME [<span id="vol-percent">70</span>%]</span>
+                    <input type="range" min="0" max="100" value="70" id="volume-slider" class="flex-1" oninput="setVolume(this.value)">
                 </div>
             </div>
 
@@ -200,6 +207,9 @@
             <nav class="module-box flex flex-col gap-2 flex-grow">
                 <button onclick="navigate('live')" id="btn-live" class="btn-matrix active">
                     <span class="status-dot"></span> <span>LIVE FEED</span>
+                </button>
+                <button onclick="navigate('video')" id="btn-video" class="btn-matrix">
+                    <span class="status-dot"></span> <span>VIDEO FEED</span>
                 </button>
                 <button onclick="navigate('news')" id="btn-news" class="btn-matrix">
                     <span class="status-dot"></span> <span>DATA STREAM</span>
@@ -248,19 +258,39 @@
                     </div>
                 </div>
 
-                <!-- TAB: NEWS -->
+                <!-- TAB: VIDEO (NEW) -->
+                <div id="view-video" class="view-section hidden">
+                    <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">LIVE VIDEO SIGNAL</h2>
+                    
+                    <!-- Responsive 16:9 Aspect Ratio Video Container -->
+                    <div class="module-box p-1" style="height: 0; padding-bottom: 56.25%; position: relative;">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            src="https://www.youtube.com/embed/OatUMBSDQyo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen 
+                            style="position: absolute; top: 0; left: 0;"
+                            title="Live Video Feed">
+                        </iframe>
+                    </div>
+                    <p class="mt-4 text-sm">SIGNAL SOURCE: YOUTUBE. AUTOPLAY MUTED DUE TO STREAM CONFLICT. CONTROLS HIDDEN.</p>
+                </div>
+
+                <!-- TAB: NEWS (DATA STREAM) -->
                 <div id="view-news" class="view-section hidden">
                     <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">DATA STREAM (ANNOUNCEMENTS)</h2>
                     <div id="news-feed" class="flex flex-col gap-2">
-                        <!-- JS Will Inject Items Here -->
+                        <!-- Dynamic Grounded News will be injected here -->
                     </div>
                 </div>
 
                 <!-- TAB: ABOUT (PROTOCOL) -->
                 <div id="view-about" class="view-section hidden">
-                    <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">SYS.PROTOCOL V6.0</h2>
+                    <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">SYS.PROTOCOL V6.2</h2>
                     <p class="mb-4 text-sm leading-relaxed">
-                        DEMOFM is a non-profit, non-commercial broadcast initiative. The interface is designed for maximum function and minimal aesthetic distraction. This system operates on a stripped-down Matrix/Bauhaus framework.
+                        DEMOFM is a non-profit, non-commercial broadcast initiative. The interface is designed for maximum function and minimal aesthetic distraction. This system operates on a stripped-down Matrix/Bauhaus framework. The DATA STREAM now integrates real-time, grounded summaries from external nodes.
                     </p>
                     <div class="module-box p-3 text-sm">
                         <p><strong>OPERATOR:</strong> MG</p>
@@ -292,22 +322,26 @@
     </iframe>
 
     <script>
+        // --- API CONFIG ---
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
         // --- UTILITIES ---
         const networkLog = document.getElementById('network-log');
-        let currentListeners = 1; // Start with 1 (the user)
+        const feedContainer = document.getElementById('news-feed');
+        let currentListeners = 1; 
+        let newsData = null; // Cache for the generated news
+        let isGenerating = false;
 
         function log(msg) {
-            // System Log Footer
             const sysLogEl = document.getElementById('sys-log');
             sysLogEl.innerText = `> ${msg}`;
             
-            // Network Log (for persistent messages)
             const li = document.createElement('li');
             const timestamp = new Date().toTimeString().split(' ')[0];
             li.innerHTML = `[${timestamp}] ${msg}`;
-            networkLog.prepend(li); // Newest message on top
+            networkLog.prepend(li); 
             
-            // Limit log to 10 entries
             while (networkLog.children.length > 10) {
                 networkLog.removeChild(networkLog.lastChild);
             }
@@ -323,39 +357,147 @@
 
             const titleMap = {
                 live: 'LIVE FREQUENCY',
+                video: 'VIDEO SIGNAL', // Added video
                 news: 'DATA STREAM',
                 about: 'SYS.PROTOCOL'
             };
             document.getElementById('screen-title').innerText = titleMap[viewId];
             log(`Navigation: Viewpoint set to ${viewId.toUpperCase()}`); 
+            
+            if (viewId === 'news') {
+                displayNewsFeed();
+            }
+            // Mute SoundCloud player if navigating to video tab
+            if (viewId === 'video' && isPlaying) {
+                 widget.setVolume(0);
+                 log("AUDIO MATRIX: Muted for video signal.");
+            } else if (viewId !== 'video') {
+                 // Restore volume if not on video tab and player is active/ready
+                 const volumeValue = document.getElementById('volume-slider').value;
+                 setVolume(volumeValue);
+            }
         }
 
-        // --- NEWS FEED GENERATOR (STARK DATA) ---
-        const newsSources = [
-            { src: 'NODE-A', title: 'ACCESS PROTOCOL UPDATED', date: 'TODAY' },
-            { src: 'SYSTEM', title: 'DB RE-INDEX COMPLETE', date: 'YESTERDAY' },
-            { src: 'ADMIN', title: 'BANDWIDTH OPTIMIZED', date: '2 DAYS AGO' }
-        ];
+        // --- NEWS FEED GENERATOR (DYNAMIC) ---
+        async function generateNewsFeed() {
+            if (isGenerating) return;
 
-        const feedContainer = document.getElementById('news-feed');
-        feedContainer.innerHTML = ''; 
-        
-        newsSources.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'module-box p-3 cursor-pointer hover:bg-green-900 transition text-sm'; 
-            div.innerHTML = `
-                <div class="flex justify-between border-b border-dashed border-current pb-1 mb-1">
-                    <span class="text-red-500">${item.src}</span>
-                    <span>${item.date}</span>
-                </div>
-                <h3 class="font-bold leading-tight">${item.title}</h3>
-            `;
-            feedContainer.appendChild(div);
-        });
-        
+            isGenerating = true;
+            log("DATA STREAM: Requesting grounded feed from AI core...");
+            feedContainer.innerHTML = '<div class="module-box p-4 text-center pulsate">ACCESSING GROUNDED DATA STREAM... PLEASE WAIT.</div>';
+
+            // Prompt requests real-world, grounded news summaries from specific sources with links
+            const userQuery = "Generate 5 short, concise, and hyper-functional news items or status reports by summarizing the latest headlines and articles from 'newmodels.io' and 'Drudge Report'. The output must be mixed between the two sources. The tone must be strictly technical and minimal, following the principles of 'form follows function'. Please attribute the 'src' field to either 'NEWMODELS' or 'DRUDGE'.";
+            
+            const systemPrompt = "You are a stark, minimal system reporter. Provide only factual, functional updates formatted as requested JSON, ensuring each item is grounded in a current source and includes the source URL.";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                // Use Google Search for grounding (real news)
+                tools: [{ "google_search": {} }], 
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING", "description": "The concise news headline or status report based on the source." },
+                                "src": { "type": "STRING", "description": "The attributed source: 'NEWMODELS' or 'DRUDGE'." },
+                                "date": { "type": "STRING", "description": "Relative date/time, e.g., 'TODAY 11:45', 'T-2HRS'." },
+                                "url": { "type": "STRING", "description": "The link to the article from the source." }
+                            },
+                            required: ["title", "src", "date", "url"],
+                            propertyOrdering: ["title", "src", "date", "url"]
+                        }
+                    }
+                }
+            };
+            
+            const maxRetries = 5;
+            let delay = 1000;
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                    const result = await response.json();
+                    
+                    // Extract and parse JSON text
+                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonText) throw new Error("API response missing content.");
+                    
+                    newsData = JSON.parse(jsonText);
+                    log("DATA STREAM: Grounded feed successfully generated and cached.");
+                    renderNewsFeed(newsData);
+                    isGenerating = false;
+                    return;
+
+                } catch (error) {
+                    console.error("AI Core Error:", error);
+                    if (attempt === maxRetries - 1) {
+                        log(`ERROR: Failed to generate data stream after ${maxRetries} attempts.`);
+                        renderNewsFeed(null, 'ERROR: NETWORK FAILED. RETRY LATER.');
+                        isGenerating = false;
+                        return;
+                    }
+                    // Exponential backoff
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; 
+                }
+            }
+        }
+
+        function renderNewsFeed(items, errorMessage = null) {
+            feedContainer.innerHTML = ''; 
+
+            if (errorMessage) {
+                feedContainer.innerHTML = `<div class="module-box p-4 text-center text-red-500 font-bold">${errorMessage}</div>`;
+                return;
+            }
+
+            if (!items || items.length === 0) {
+                feedContainer.innerHTML = `<div class="module-box p-4 text-center">DATA STREAM EMPTY. PRESS REFRESH.</div>`;
+                return;
+            }
+            
+            items.forEach(item => {
+                const a = document.createElement('a'); // Use <a> tag for clickable link
+                a.href = item.url || '#'; 
+                a.target = '_blank'; // Open in new tab
+                
+                a.className = 'module-box p-3 cursor-pointer hover:bg-green-900 transition text-sm block'; // Added 'block' for full link area
+                a.innerHTML = `
+                    <div class="flex justify-between border-b border-dashed border-current pb-1 mb-1">
+                        <span class="text-red-500">${item.src || 'UNKNOWN_SRC'}</span>
+                        <span>${item.date || 'DATETIME_ERR'}</span>
+                    </div>
+                    <h3 class="font-bold leading-tight">${item.title || 'CONTENT_ERROR'}</h3>
+                `;
+                feedContainer.appendChild(a);
+            });
+        }
+
+        function displayNewsFeed() {
+            if (newsData && !isGenerating) {
+                // If cached, display instantly
+                renderNewsFeed(newsData);
+            } else if (!isGenerating) {
+                // If not cached, fetch new data
+                generateNewsFeed();
+            }
+            // If isGenerating is true, do nothing, the loading indicator is already shown.
+        }
+
         // --- LISTENER COUNT SIMULATION ---
         function updateListeners() {
-            // Keep the initial listener count logic simple and functional
             document.getElementById('listener-count').innerText = currentListeners.toString().padStart(2, '0');
         }
         
@@ -368,13 +510,17 @@
         log("Initializing Audio Matrix...");
         updateListeners(); // Set initial count
 
-        widget.setVolume(0.7);
+        // Removed widget.setVolume(0.7) from here, now set in init section below
 
         widget.bind(SC.Widget.Events.READY, function() {
             log("Audio Matrix Online. Awaiting command.");
             document.getElementById('track-name').innerText = "READY // ACTIVATE STREAM";
             document.getElementById('player-status').innerText = "IDLE";
             statusDot.classList.remove('pulsate');
+            
+            // Set initial volume after widget is ready, using the slider's default value
+            const initialVolume = document.getElementById('volume-slider').value;
+            setVolume(initialVolume);
         });
 
         widget.bind(SC.Widget.Events.PLAY, function() {
@@ -442,8 +588,18 @@
 
         function setVolume(val) {
             if(!widget) return;
-            widget.setVolume(val / 100);
-            log(`Volume: ${val}%`);
+            const volumeValue = parseInt(val, 10);
+            
+            // 1. Update SoundCloud widget
+            widget.setVolume(volumeValue / 100); 
+            
+            // 2. Update UI for immediate feedback
+            const volPercentEl = document.getElementById('vol-percent');
+            if (volPercentEl) {
+                volPercentEl.innerText = volumeValue;
+            }
+            
+            log(`Volume: ${volumeValue}%`);
         }
         
         // --- CLOCK (Including seconds for more technical look) ---
@@ -460,6 +616,78 @@
         // Initialize on Live view
         navigate('live');
         updateClock();
+
+
+        // --- PWA SERVICE WORKER REGISTRATION (Embedded) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Service Worker content as a Blob URL
+                const swContent = `
+                    const CACHE_NAME = 'demofm-matrix-v6-2'; // Updated cache name
+                    const urlsToCache = [
+                      './', 
+                      'https://cdn.tailwindcss.com',
+                      'https://w.soundcloud.com/player/api.js',
+                      'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap'
+                    ];
+
+                    self.addEventListener('install', (event) => {
+                      self.skipWaiting();
+                      event.waitUntil(
+                        caches.open(CACHE_NAME)
+                          .then((cache) => {
+                            return cache.addAll(urlsToCache);
+                          })
+                      );
+                    });
+
+                    self.addEventListener('fetch', (event) => {
+                      // Strategy: Cache-First for App Shell, Network-Only for everything else (like media streams)
+                      const url = event.request.url;
+                      const shouldCache = urlsToCache.some(cacheUrl => url.includes(cacheUrl) || url.endsWith('/'));
+
+                      if (shouldCache) {
+                        event.respondWith(
+                          caches.match(event.request)
+                            .then((response) => {
+                              return response || fetch(event.request);
+                            })
+                        );
+                      } else {
+                        // All other requests (external scripts, media, etc.) go directly to network
+                        event.respondWith(fetch(event.request));
+                      }
+                    });
+
+                    self.addEventListener('activate', (event) => {
+                      const cacheWhitelist = [CACHE_NAME];
+                      event.waitUntil(
+                        caches.keys().then((cacheNames) => {
+                          return Promise.all(
+                            cacheNames.map((cacheName) => {
+                              if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                return caches.delete(cacheName);
+                              }
+                            })
+                          );
+                        })
+                      );
+                    });
+                `;
+
+                const blob = new Blob([swContent], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => {
+                        log('PWA Protocol: Service Worker registered successfully.');
+                    })
+                    .catch(error => {
+                        log(`ERROR: Service Worker registration failed: ${error}`);
+                    });
+            });
+        }
+
 
     </script>
 </body>
