@@ -3,108 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DEMOFM | TERMINAL</title>
+    <title>DEMOFM | MATRIX/BAUHAUS</title>
     
     <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#000000">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://w.soundcloud.com/player/api.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- BAUHAUS/MATRIX STYLES --- */
         :root {
-            --bg: #ffffff;
-            --fg: #000000;
-            --accent: #ff0000; /* Bright Red for indicators */
-            --border: 2px solid #000000;
-            --font-main: 'Space Mono', monospace;
+            --bg: #000000;
+            --fg: #00ff00; /* Matrix Green */
+            --border: 1px solid var(--fg);
+            --font-main: 'Courier Prime', 'Courier New', monospace;
         }
 
         body {
             background-color: var(--bg);
             color: var(--fg);
             font-family: var(--font-main);
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
-            overflow: hidden;
             display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Ryne Heslin / Brutalist UI Components --- */
-        .border-box {
-            border: var(--border);
-            background: var(--bg);
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem;
+            box-sizing: border-box;
         }
         
-        /* Removed shadows and complex transitions for starkness */
-        .btn-stark {
+        /* Main Application Frame (Maximized, no fluff) */
+        .app-frame {
+            background-color: var(--bg);
+            width: 100%;
+            max-width: 1400px;
+            height: 98vh;
+            max-height: 900px;
             border: var(--border);
+            overflow: hidden;
+        }
+
+        /* --- UI Components --- */
+        .module-box {
+            border: var(--border);
+            padding: 0.75rem;
+            background-color: var(--bg);
+        }
+        
+        .btn-matrix {
             background: var(--bg);
             color: var(--fg);
-            padding: 10px 15px;
-            font-weight: bold;
+            padding: 8px 12px;
+            font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
+            border: var(--border);
             transition: all 0.1s;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            line-height: 1; /* Crisp text */
         }
 
-        /* Inverted colors on hover for a terminal feedback effect */
-        .btn-stark:hover {
+        /* Inverted colors on hover/active for functional feedback */
+        .btn-matrix:hover, .btn-matrix.active {
             background: var(--fg);
             color: var(--bg);
         }
 
-        /* Active state is inverted + red indicator */
-        .btn-stark.active {
-            background: var(--fg);
-            color: var(--bg);
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--fg);
+            background-color: transparent;
+            margin-right: 6px;
+            transition: background-color 0.2s;
         }
 
-        .btn-stark.active .icon-indicator {
-            background: var(--accent);
-            border-color: var(--accent);
+        .btn-matrix.active .status-dot {
+            background: var(--bg); /* Inverted color */
         }
 
-        .icon-indicator {
-            width: 10px;
-            height: 10px;
-            border: 1px solid currentColor;
-            margin-right: 10px;
-            flex-shrink: 0;
+        .pulsate { animation: pulsate-anim 1s linear infinite; }
+        @keyframes pulsate-anim { 50% { opacity: 0.5; } }
+
+        /* Track/Info Display - Single line, minimal noise */
+        .info-display {
+            background: var(--bg);
+            border: var(--border);
+            color: var(--fg);
+            padding: 0.5rem;
+            font-size: 1.1rem;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
-        /* Volume slider styling to match the technical look */
+        /* Volume Slider - Clean, functional styling */
         input[type=range] {
             -webkit-appearance: none;
             appearance: none;
-            height: 4px;
+            height: 2px;
             background: var(--fg);
             cursor: pointer;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border: var(--border);
+            width: 10px;
+            height: 10px;
+            background: var(--fg);
+            border: 1px solid var(--bg);
         }
-        input[type=range]::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border: var(--border);
-        }
-
-        /* --- Animations --- */
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
 
         /* --- Layout --- */
         .layout-grid {
@@ -118,9 +130,14 @@
                 flex-direction: row;
             }
             .sidebar {
-                width: 320px; /* slightly narrower for more content space */
+                width: 300px;
                 flex-shrink: 0;
+                border-right: var(--border);
             }
+        }
+        .content-area {
+            border-top: var(--border);
+            padding: 0.75rem;
         }
 
         .scroll-hide::-webkit-scrollbar { display: none; }
@@ -129,191 +146,143 @@
 </head>
 <body>
 
-    <!-- MAIN CONTAINER -->
-    <!-- Removed bg-gray-100 for a pure white canvas -->
-    <div class="layout-grid p-2 md:p-4 gap-4 h-full w-full">
+    <!-- MAIN APP FRAME -->
+    <div class="app-frame layout-grid">
 
         <!-- LEFT COLUMN: CONTROLS & NAV -->
-        <aside class="sidebar flex flex-col gap-4 h-auto md:h-full">
+        <aside class="sidebar flex flex-col h-auto md:h-full p-2 gap-3">
             
             <!-- 1. HEADER LOGO -->
-            <div class="border-box p-4 flex justify-between items-center">
+            <div class="module-box p-3 border-none flex justify-between items-center">
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter leading-none">DEMO<span style="color: var(--accent);">FM</span></h1>
-                    <p class="text-xs font-bold mt-1">V4.0 // ONLINE</p>
+                    <h1 class="text-3xl font-black tracking-tighter leading-none text-red-500">
+                        <span style="color: var(--fg);">DEMO</span>FM
+                    </h1>
+                    <p class="text-xs mt-1">V6.0 // ONLINE</p>
                 </div>
-                <div class="w-4 h-4 bg-red-600 border border-black blink"></div>
+                <!-- Status indicator -->
+                <div id="connection-dot" class="status-dot"></div>
             </div>
 
-            <!-- 2. NAVIGATION -->
-            <nav class="border-box p-2 flex flex-col gap-2 flex-grow-0">
-                <button onclick="navigate('live')" id="btn-live" class="btn-stark active">
-                    <div class="icon-indicator bg-red-500"></div> <span>LIVE FEED</span>
-                </button>
-                <button onclick="navigate('news')" id="btn-news" class="btn-stark">
-                    <div class="icon-indicator"></div> <span>DATA STREAM</span>
-                </button>
-                <button onclick="navigate('events')" id="btn-events" class="btn-stark">
-                    <div class="icon-indicator"></div> <span>EVENTS</span>
-                </button>
-                <button onclick="navigate('about')" id="btn-about" class="btn-stark">
-                    <div class="icon-indicator"></div> <span>PROTOCOL</span>
-                </button>
-            </nav>
-
-            <!-- 3. PLAYER MODULE -->
-            <div class="border-box p-4 mt-auto flex flex-col gap-3">
-                <div class="border-b-2 border-black pb-2 mb-1 flex justify-between">
-                    <span class="text-xs font-bold">AUDIO_CONTROLLER</span>
-                    <span id="player-status" class="text-xs text-red-600 blink">OFFLINE</span>
+            <!-- 2. PLAYER MODULE -->
+            <div class="module-box flex flex-col gap-3">
+                <div class="flex justify-between items-center text-xs pb-2 border-b border-dashed border-current">
+                    <span>AUDIO_MATRIX</span>
+                    <span id="player-status" class="text-xs">IDLE</span>
                 </div>
                 
                 <!-- Track Display -->
-                <div class="bg-black text-white p-2 font-mono text-sm overflow-hidden whitespace-nowrap">
-                    <span id="track-name">INITIALIZING WIDGET...</span>
+                <div class="info-display">
+                    <span id="track-name" class="block whitespace-nowrap overflow-hidden text-ellipsis">COMMENCING BROADCAST...</span>
                 </div>
 
                 <!-- Controls -->
-                <div class="grid grid-cols-2 gap-2">
-                    <!-- Note: Removed hover:bg-red-50 for starkness -->
-                    <button onclick="toggleAudio()" class="btn-stark justify-center text-center py-4">
-                        ⏯ PLAY
+                <div class="grid grid-cols-3 gap-2 mt-1">
+                    <button onclick="toggleAudio()" class="btn-matrix">
+                        ⏯
                     </button>
-                    <button onclick="skipTrack()" class="btn-stark justify-center text-center py-4">
-                        ⏭ NEXT
+                    <button onclick="skipTrack()" class="btn-matrix">
+                        ⏭
+                    </button>
+                    <button onclick="randomSkip()" class="btn-matrix">
+                        RND
                     </button>
                 </div>
 
                 <!-- Volume -->
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="text-xs font-bold w-1/5">VOL</span>
-                    <!-- Applied custom CSS styling to the range input -->
-                    <input type="range" min="0" max="100" value="70" class="flex-1 border-0" oninput="setVolume(this.value)">
+                <div class="flex items-center gap-3 mt-2">
+                    <span class="text-xs w-1/5">VOLUME</span>
+                    <input type="range" min="0" max="100" value="70" class="flex-1" oninput="setVolume(this.value)">
                 </div>
             </div>
+
+            <!-- 3. NAVIGATION -->
+            <nav class="module-box flex flex-col gap-2 flex-grow">
+                <button onclick="navigate('live')" id="btn-live" class="btn-matrix active">
+                    <span class="status-dot"></span> <span>LIVE FEED</span>
+                </button>
+                <button onclick="navigate('news')" id="btn-news" class="btn-matrix">
+                    <span class="status-dot"></span> <span>DATA STREAM</span>
+                </button>
+                <button onclick="navigate('about')" id="btn-about" class="btn-matrix">
+                    <span class="status-dot"></span> <span>PROTOCOL</span>
+                </button>
+            </nav>
+            
+             <!-- Listener Count (Functional Component) -->
+            <div class="module-box text-center">
+                <div id="listener-count" class="text-2xl font-bold">--</div>
+                <div class="text-xs mt-1">LISTENERS CONNECTED</div>
+            </div>
+
         </aside>
 
         <!-- RIGHT COLUMN: CONTENT SCREEN -->
-        <main class="border-box flex-1 relative overflow-hidden flex flex-col">
+        <main class="flex-1 relative overflow-hidden flex flex-col">
             
             <!-- Window Header -->
-            <div class="bg-black text-white p-2 flex justify-between items-center text-sm font-bold sticky top-0 z-10">
-                <span id="screen-title">VIEWPORT: LIVE</span>
-                <span class="border border-white px-1 text-[10px]" id="clock">00:00</span>
+            <div class="bg-black text-white p-2 flex justify-between items-center text-sm font-bold border-b border-current" style="color: var(--fg);">
+                <span id="screen-title">LIVE FREQUENCY</span>
+                <!-- Time Display -->
+                <span class="text-xs border border-current px-1" id="clock">00:00:00</span>
             </div>
 
             <!-- Scrollable Content Area -->
-            <div class="overflow-y-auto p-4 md:p-8 h-full scroll-hide relative" id="content-area">
+            <div class="overflow-y-auto h-full scroll-hide relative content-area" id="content-area">
                 
                 <!-- TAB: LIVE -->
                 <div id="view-live" class="view-section">
-                    <!-- Simplified the broadcast info block -->
-                    <div class="border-2 border-black p-6 mb-8">
-                        <h2 class="text-3xl md:text-5xl font-bold mb-2 uppercase">CURRENT BROADCAST</h2>
-                        <p class="text-sm font-bold text-red-600 mb-4">
-                            <span class="text-black">STATUS: </span>
-                            <span class="text-red-600">TRANSMITTING [LONDON NODE]</span>
-                        </p>
-                        <p class="text-lg leading-relaxed mt-4 border-t-2 border-black pt-4">
-                            Welcome to the DEMOFM open frequency. We are currently aggregating audio signals from the <strong>Mat Guzzo</strong> archives. Use the controls on the left to navigate and operate the player.
+                    <div class="module-box p-4 mb-4 border-dashed">
+                        <h2 class="text-xl font-bold mb-2 uppercase">CURRENT BROADCAST</h2>
+                        <p class="text-sm border-t border-dashed border-current pt-2">
+                            STATUS: <span class="text-red-500">STREAMING @ 320 KBPS</span><br>
+                            SOURCE: Fusion Festival 2019 Set Archive
                         </p>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border-box p-4">
-                            <h3 class="font-bold border-b border-black pb-1 mb-2">CHAT LOG / NODE ACTIVITY</h3>
-                            <ul class="text-sm space-y-1 font-mono text-gray-700">
-                                <li><span class="text-blue-600">NODE-99:</span> Signal strong.</li>
-                                <li><span class="text-red-600">SYS_ADMIN:</span> Bitrate steady @ 320kbps.</li>
-                                <li><span class="text-blue-600">GUEST:</span> ID on this track?</li>
-                            </ul>
-                        </div>
-                        <div class="border-box p-4 bg-black text-white flex flex-col justify-center items-center text-center">
-                            <div class="text-4xl font-bold mb-2 text-red-500">32</div>
-                            <div class="text-xs">LISTENERS CONNECTED</div>
-                        </div>
+                    
+                    <h3 class="text-lg font-bold uppercase mt-6 mb-2">NETWORK LOG</h3>
+                    <div class="module-box p-4 h-48 overflow-y-auto text-sm">
+                        <ul id="network-log" class="space-y-1">
+                            <!-- JS Log will go here -->
+                        </ul>
                     </div>
                 </div>
 
                 <!-- TAB: NEWS -->
                 <div id="view-news" class="view-section hidden">
-                    <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">DATA STREAM</h2>
-                    <div id="news-feed" class="flex flex-col gap-4">
+                    <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">DATA STREAM (ANNOUNCEMENTS)</h2>
+                    <div id="news-feed" class="flex flex-col gap-2">
                         <!-- JS Will Inject Items Here -->
                     </div>
                 </div>
 
-                <!-- TAB: EVENTS -->
-                <div id="view-events" class="view-section hidden">
-                     <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">UPCOMING</h2>
-                     
-                     <div class="flex flex-col gap-4">
-                        <!-- Event Card -->
-                        <div class="border-box p-0 flex flex-col md:flex-row">
-                            <div class="bg-black text-white p-4 flex flex-col justify-center items-center md:w-32 border-r-2 border-black">
-                                <span class="text-3xl font-bold text-red-500">12</span>
-                                <span class="text-sm">DEC</span>
-                            </div>
-                            <div class="p-4 flex-1">
-                                <h3 class="text-xl font-bold">WAREHOUSE PROJECT 01</h3>
-                                <p class="text-sm text-gray-700">Location: Secret Location, LDN</p>
-                                <button class="mt-2 text-xs bg-red-600 text-white px-2 py-1 uppercase hover:bg-black hover:text-red-600">Access Denied</button>
-                            </div>
-                        </div>
-
-                        <!-- Event Card -->
-                        <div class="border-box p-0 flex flex-col md:flex-row">
-                            <div class="bg-white border-r-2 border-black text-black p-4 flex flex-col justify-center items-center md:w-32">
-                                <span class="text-3xl font-bold">05</span>
-                                <span class="text-sm">JAN</span>
-                            </div>
-                            <div class="p-4 flex-1">
-                                <h3 class="text-xl font-bold">ONLINE BROADCAST MARATHON</h3>
-                                <p class="text-sm text-gray-700">Location: Global Stream</p>
-                                <button class="mt-2 text-xs border border-black px-2 py-1 uppercase hover:bg-black hover:text-white">Request Remind</button>
-                            </div>
-                        </div>
-                     </div>
-                </div>
-
-                <!-- TAB: ABOUT -->
+                <!-- TAB: ABOUT (PROTOCOL) -->
                 <div id="view-about" class="view-section hidden">
-                    <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">SYS.PROTOCOL</h2>
-                    <div class="prose font-mono text-sm max-w-xl">
-                        <p class="mb-4">
-                            DEMOFM is a conceptual auditory interface designed for the post-internet era. We curate sounds that bridge the gap between digital coldness and analog warmth. The system aims for maximum clarity and minimum aesthetic friction.
-                        </p>
-                        <p class="mb-4">
-                            <strong>OPERATOR:</strong> Mat Guzzo<br>
-                            <strong>VERSION:</strong> 4.0 (Brutalist)<br>
-                            <strong>LOCATION:</strong> Worldwide Web
-                        </p>
-                        <div class="border border-black p-4 bg-gray-50 mt-8">
-                            <p class="text-xs mb-2 font-bold">DEBUG INFO:</p>
-                            <p class="text-xs text-gray-700">
-                                RENDERER: HTML5/CANVAS<br>
-                                AUDIO: SC_API_V2<br>
-                                COLOR_MODE: HIGH_CONTRAST (B/W/R)
-                            </p>
-                        </div>
+                    <h2 class="text-xl font-bold uppercase mb-4 border-b border-current pb-1">SYS.PROTOCOL V6.0</h2>
+                    <p class="mb-4 text-sm leading-relaxed">
+                        DEMOFM is a non-profit, non-commercial broadcast initiative. The interface is designed for maximum function and minimal aesthetic distraction. This system operates on a stripped-down Matrix/Bauhaus framework.
+                    </p>
+                    <div class="module-box p-3 text-sm">
+                        <p><strong>OPERATOR:</strong> MG</p>
+                        <p><strong>FRAMEWORK:</strong> HTML5/Tailwind-V6</p>
+                        <p><strong>FONT:</strong> Courier Prime</p>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Log Footer -->
-            <div class="bg-black text-white p-1 text-[10px] font-mono flex gap-4 px-2">
-                <span class="text-red-500 font-bold">LOG:</span>
-                <span id="sys-log">System Ready. Waiting for user input.</span>
+            <!-- Global Status Log Footer -->
+            <div class="bg-black text-xs font-bold p-1 border-t border-current sticky bottom-0 flex-shrink-0">
+                <span class="text-red-500 font-bold px-1">LOG:</span>
+                <span id="sys-log">System Initializing...</span>
             </div>
 
         </main>
     </div>
 
     <!-- SOUNDCLOUD WIDGET (Hidden) -->
-    <!-- Attempting to load User Likes. If this fails, the 'onerror' logic isn't native to the iframe, so we rely on Widget API events -->
     <iframe id="sc-widget" 
-            src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/matguzzo/likes&color=%23ff0000&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true" 
+            src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/ticket-countdown/sets/fusion-festival-2019-sets&color=%2300ff00&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true" 
             width="100%" 
             height="166" 
             scrolling="no" 
@@ -323,86 +292,106 @@
     </iframe>
 
     <script>
-        // --- LOGGING UTILITY ---
-        function log(msg) {
-            const el = document.getElementById('sys-log');
-            el.innerText = `> ${msg}`;
-            console.log(msg);
-        }
+        // --- UTILITIES ---
+        const networkLog = document.getElementById('network-log');
+        let currentListeners = 1; // Start with 1 (the user)
 
+        function log(msg) {
+            // System Log Footer
+            const sysLogEl = document.getElementById('sys-log');
+            sysLogEl.innerText = `> ${msg}`;
+            
+            // Network Log (for persistent messages)
+            const li = document.createElement('li');
+            const timestamp = new Date().toTimeString().split(' ')[0];
+            li.innerHTML = `[${timestamp}] ${msg}`;
+            networkLog.prepend(li); // Newest message on top
+            
+            // Limit log to 10 entries
+            while (networkLog.children.length > 10) {
+                networkLog.removeChild(networkLog.lastChild);
+            }
+        }
+        
         // --- NAVIGATION ---
         function navigate(viewId) {
-            // Hide all views
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.btn-stark').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.btn-matrix').forEach(el => el.classList.remove('active'));
 
-            // Show target
             document.getElementById('view-' + viewId).classList.remove('hidden');
             document.getElementById('btn-' + viewId).classList.add('active');
 
-            // Update Header
-            document.getElementById('screen-title').innerText = `VIEWPORT: ${viewId.toUpperCase()}`;
-            // FIX: Corrected typo from 'Mapsd' to 'Navigated'
-            log(`Mapsd to ${viewId.toUpperCase()}`); 
+            const titleMap = {
+                live: 'LIVE FREQUENCY',
+                news: 'DATA STREAM',
+                about: 'SYS.PROTOCOL'
+            };
+            document.getElementById('screen-title').innerText = titleMap[viewId];
+            log(`Navigation: Viewpoint set to ${viewId.toUpperCase()}`); 
         }
 
-        // --- NEWS FEED GENERATOR ---
+        // --- NEWS FEED GENERATOR (STARK DATA) ---
         const newsSources = [
-            { src: 'NEW MODELS', title: 'Why the internet feels smaller in 2024', date: 'TODAY' },
-            { src: 'RA.CO', title: 'Berlin clubs facing new zoning laws', date: 'YESTERDAY' },
-            { src: 'THE VERGE', title: 'Winamp releases open source code', date: '2 DAYS AGO' },
-            { src: 'DEMOFM', title: 'System maintenance complete.', date: '3 DAYS AGO' }
+            { src: 'NODE-A', title: 'ACCESS PROTOCOL UPDATED', date: 'TODAY' },
+            { src: 'SYSTEM', title: 'DB RE-INDEX COMPLETE', date: 'YESTERDAY' },
+            { src: 'ADMIN', title: 'BANDWIDTH OPTIMIZED', date: '2 DAYS AGO' }
         ];
 
         const feedContainer = document.getElementById('news-feed');
-        // Clear previous content just in case
         feedContainer.innerHTML = ''; 
         
         newsSources.forEach(item => {
             const div = document.createElement('div');
-            // Simplified class for stark look
-            div.className = 'border-box p-4 hover:bg-gray-100 cursor-pointer transition'; 
+            div.className = 'module-box p-3 cursor-pointer hover:bg-green-900 transition text-sm'; 
             div.innerHTML = `
-                <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
-                    <span class="text-red-600">${item.src}</span>
+                <div class="flex justify-between border-b border-dashed border-current pb-1 mb-1">
+                    <span class="text-red-500">${item.src}</span>
                     <span>${item.date}</span>
                 </div>
-                <h3 class="text-lg font-bold leading-tight">${item.title}</h3>
+                <h3 class="font-bold leading-tight">${item.title}</h3>
             `;
             feedContainer.appendChild(div);
         });
+        
+        // --- LISTENER COUNT SIMULATION ---
+        function updateListeners() {
+            // Keep the initial listener count logic simple and functional
+            document.getElementById('listener-count').innerText = currentListeners.toString().padStart(2, '0');
+        }
         
         // --- AUDIO ENGINE ---
         var widgetIframe = document.getElementById('sc-widget');
         var widget = SC.Widget(widgetIframe);
         var isPlaying = false;
+        const statusDot = document.getElementById('connection-dot');
 
-        log("Initializing Audio Engine...");
-        
-        // Set initial volume
+        log("Initializing Audio Matrix...");
+        updateListeners(); // Set initial count
+
         widget.setVolume(0.7);
 
         widget.bind(SC.Widget.Events.READY, function() {
-            log("Audio Engine Connected. Widget is ready.");
-            document.getElementById('track-name').innerText = "READY // PRESS PLAY";
-            document.getElementById('player-status').innerText = "STANDBY";
-            document.getElementById('player-status').classList.remove('blink');
+            log("Audio Matrix Online. Awaiting command.");
+            document.getElementById('track-name').innerText = "READY // ACTIVATE STREAM";
+            document.getElementById('player-status').innerText = "IDLE";
+            statusDot.classList.remove('pulsate');
         });
 
         widget.bind(SC.Widget.Events.PLAY, function() {
             isPlaying = true;
-            document.getElementById('player-status').innerText = "PLAYING";
-            document.getElementById('player-status').classList.add('blink');
+            document.getElementById('player-status').innerText = "STREAMING";
+            statusDot.classList.add('pulsate');
+            statusDot.style.backgroundColor = 'var(--fg)';
             
             widget.getCurrentSound(function(sound) {
                 if(sound) {
                     let title = sound.title;
-                    if(title.length > 25) title = title.substring(0, 25) + "...";
+                    if(title.length > 30) title = title.substring(0, 30) + "...";
                     document.getElementById('track-name').innerText = title.toUpperCase();
                     log(`Now Playing: ${title}`);
                 } else {
                     document.getElementById('track-name').innerText = "ERROR // TRACK INFO UNAVAILABLE";
-                    log("Warning: Started playing but track info is unavailable (SoundCloud limitation).");
+                    log("WARNING: Track metadata unavailable.");
                 }
             });
         });
@@ -410,7 +399,8 @@
         widget.bind(SC.Widget.Events.PAUSE, function() {
             isPlaying = false;
             document.getElementById('player-status').innerText = "PAUSED";
-            document.getElementById('player-status').classList.remove('blink');
+            statusDot.classList.remove('pulsate');
+            statusDot.style.backgroundColor = 'transparent';
         });
 
         function toggleAudio() {
@@ -420,26 +410,56 @@
 
         function skipTrack() {
             if(!widget) return;
-            log("Skipping track...");
+            log("Jumping to NEXT track.");
             widget.next();
+        }
+        
+        function randomSkip() {
+            if (!widget) return;
+            // Skip 1 to 4 tracks forward
+            const skipCount = Math.floor(Math.random() * 4) + 1; 
+            log(`RANDOM SKIP: ${skipCount} tracks forward.`);
+            
+            let i = 0;
+            // Sequential next() calls to simulate a random jump
+            const interval = setInterval(() => {
+                if (i < skipCount) {
+                    widget.next();
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    // Wait for the final track to load before logging
+                    setTimeout(() => {
+                        widget.getCurrentSound(function(sound) {
+                            if (sound) {
+                                log(`Randomized to: ${sound.title}`);
+                            }
+                        });
+                    }, 500);
+                }
+            }, 100); 
         }
 
         function setVolume(val) {
             if(!widget) return;
             widget.setVolume(val / 100);
-            log(`Volume set to ${val}%`);
+            log(`Volume: ${val}%`);
         }
         
-        // --- CLOCK ---
-        setInterval(() => {
+        // --- CLOCK (Including seconds for more technical look) ---
+        function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = 
                 now.getHours().toString().padStart(2,'0') + ':' + 
-                now.getMinutes().toString().padStart(2,'0');
-        }, 1000);
+                now.getMinutes().toString().padStart(2,'0') + ':' +
+                now.getSeconds().toString().padStart(2,'0');
+        }
+
+        setInterval(updateClock, 1000);
 
         // Initialize on Live view
         navigate('live');
+        updateClock();
 
     </script>
 </body>
