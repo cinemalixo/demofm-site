@@ -1,296 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOFM | ONLINE RADIO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DEMOFM | TERMINAL</title>
+    
+    <!-- PWA Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ffffff">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://w.soundcloud.com/player/api.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #e0e5ec;
-            --win-gray: #c0c0c0;
-            --win-highlight: #ffffff;
-            --win-shadow: #000000;
-            --accent-pink: #ff7eb3;
-            --accent-blue: #7afcff;
+            --bg: #ffffff;
+            --fg: #000000;
+            --accent: #ff0000; /* Bright Red */
+            --border: 2px solid #000000;
             --font-main: 'Space Mono', monospace;
-            --font-retro: 'VT323', monospace;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg);
+            color: var(--fg);
             font-family: var(--font-main);
-            overflow: hidden;
-            color: #222;
-        }
-
-        /* --- Retro Effects --- */
-        
-        /* Dither Background */
-        .dither-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
             height: 100vh;
-            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-            z-index: -2;
-        }
-        
-        .dither-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqhgYQAwcjBBJzAARBAA+nQ8i6LCs8wAAAABJRU5ErkJggg==');
-            background-repeat: repeat;
-            opacity: 0.15;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* CRT Scanlines */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 3px, 3px 100%;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        /* Text Selection */
-        ::selection {
-            background: var(--accent-pink);
-            color: white;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- UI Components --- */
-
-        /* Retro Window Box */
-        .retro-box {
-            background: var(--win-gray);
-            border-top: 2px solid var(--win-highlight);
-            border-left: 2px solid var(--win-highlight);
-            border-right: 2px solid var(--win-shadow);
-            border-bottom: 2px solid var(--win-shadow);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        .border-box {
+            border: var(--border);
+            background: var(--bg);
         }
 
-        .retro-inset {
-            background: #fff;
-            border-top: 2px solid var(--win-shadow);
-            border-left: 2px solid var(--win-shadow);
-            border-right: 2px solid var(--win-highlight);
-            border-bottom: 2px solid var(--win-highlight);
-        }
-
-        .title-bar {
-            background: linear-gradient(90deg, #000080, #1084d0);
-            color: white;
-            padding: 4px 8px;
-            font-family: var(--font-main);
+        .btn-retro {
+            border: var(--border);
+            background: var(--bg);
+            color: var(--fg);
+            padding: 10px 15px;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            letter-spacing: 1px;
-        }
-
-        .retro-btn {
-            background: var(--win-gray);
-            border-top: 2px solid var(--win-highlight);
-            border-left: 2px solid var(--win-highlight);
-            border-right: 2px solid var(--win-shadow);
-            border-bottom: 2px solid var(--win-shadow);
-            padding: 4px 12px;
-            font-family: var(--font-main);
+            text-transform: uppercase;
             cursor: pointer;
             transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .retro-btn:active {
-            border-top: 2px solid var(--win-shadow);
-            border-left: 2px solid var(--win-shadow);
-            border-right: 2px solid var(--win-highlight);
-            border-bottom: 2px solid var(--win-highlight);
-            transform: translate(1px, 1px);
+        .btn-retro:hover {
+            background: #f0f0f0;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px var(--fg);
         }
 
-        .retro-btn.active-tab {
-            background: var(--accent-pink);
-            color: white;
-            border-style: inset;
+        .btn-retro:active {
+            transform: translate(0, 0);
+            box-shadow: none;
         }
 
-        /* Marquee */
-        .marquee-container {
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .marquee-content {
-            display: inline-block;
-            animation: marquee 15s linear infinite;
-        }
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        .btn-retro.active {
+            background: var(--fg);
+            color: var(--bg);
         }
 
-        /* Tape Spinner Animation */
-        .tape-gear {
-            animation: spin 2s linear infinite;
-            animation-play-state: paused;
+        .btn-retro.active .icon-indicator {
+            background: var(--accent);
         }
-        .playing .tape-gear {
-            animation-play-state: running;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 12px; }
-        ::-webkit-scrollbar-track { background: #dfdfdf; }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--win-gray); 
-            border: 1px solid black;
-            box-shadow: inset 1px 1px white;
+        .icon-indicator {
+            width: 10px;
+            height: 10px;
+            border: 1px solid currentColor;
+            margin-right: 10px;
+        }
+
+        /* --- Animations --- */
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* --- Layout --- */
+        .layout-grid {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .layout-grid {
+                flex-direction: row;
+            }
+            .sidebar {
+                width: 350px;
+                flex-shrink: 0;
+            }
+        }
+
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Dither effect on images */
+        .dither-img {
+            filter: contrast(120%) grayscale(100%);
+            mix-blend-mode: multiply;
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col md:flex-row p-2 md:p-6 gap-4">
+<body>
 
-    <!-- Background Effects -->
-    <div class="dither-bg"></div>
-    <div class="dither-overlay"></div>
-    <div class="scanlines"></div>
+    <!-- MAIN CONTAINER -->
+    <div class="layout-grid p-2 md:p-4 gap-4 bg-gray-100 h-full w-full">
 
-    <!-- LEFT COLUMN: Navigation & Info -->
-    <div class="w-full md:w-80 flex flex-col gap-4 z-10">
-        
-        <!-- Logo / Brand Box -->
-        <div class="retro-box p-1">
-            <div class="title-bar text-xs">
-                <span>SYSTEM.EXE</span>
-                <span class="bg-gray-300 text-black px-1 text-[10px] cursor-pointer">X</span>
-            </div>
-            <div class="p-4 text-center">
-                <h1 class="text-4xl font-bold font-[VT323] tracking-widest mb-1 drop-shadow-md">DEMO<span class="text-[#ff0055]">FM</span></h1>
-                <p class="text-xs uppercase tracking-widest text-gray-600 mb-4">Worldwide Broadcast</p>
-                <div id="clock" class="retro-inset p-2 font-[VT323] text-2xl text-center bg-black text-green-400">
-                    00:00:00
+        <!-- LEFT COLUMN: CONTROLS & NAV -->
+        <aside class="sidebar flex flex-col gap-4 h-auto md:h-full">
+            
+            <!-- 1. HEADER LOGO -->
+            <div class="border-box p-4 flex justify-between items-center bg-white">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tighter leading-none">DEMO<span style="color: var(--accent);">FM</span></h1>
+                    <p class="text-xs font-bold mt-1">V3.0 // ONLINE</p>
                 </div>
+                <div class="w-4 h-4 bg-red-600 rounded-full blink"></div>
             </div>
-        </div>
 
-        <!-- Navigation Menu -->
-        <div class="retro-box p-1 flex-grow md:flex-grow-0">
-            <div class="title-bar text-xs mb-1">
-                <span>MENU</span>
-            </div>
-            <div class="flex flex-col gap-2 p-2">
-                <button onclick="switchTab('live')" class="retro-btn active-tab text-left" id="btn-live">📡 LIVE FEED</button>
-                <button onclick="switchTab('news')" class="retro-btn text-left" id="btn-news">📰 NEWS PAPER</button>
-                <button onclick="switchTab('events')" class="retro-btn text-left" id="btn-events">📅 EVENTS</button>
-                <button onclick="switchTab('mixtapes')" class="retro-btn text-left" id="btn-mixtapes">💾 MIXTAPES</button>
-                <button onclick="switchTab('about')" class="retro-btn text-left" id="btn-about">💾 ABOUT_US</button>
-            </div>
-        </div>
+            <!-- 2. NAVIGATION -->
+            <nav class="border-box p-2 flex flex-col gap-2 bg-white flex-grow-0">
+                <button onclick="navigate('live')" id="btn-live" class="btn-retro active">
+                    <span>LIVE FEED</span> <div class="icon-indicator bg-red-500"></div>
+                </button>
+                <button onclick="navigate('news')" id="btn-news" class="btn-retro">
+                    <span>DATA STREAM</span> <div class="icon-indicator"></div>
+                </button>
+                <button onclick="navigate('events')" id="btn-events" class="btn-retro">
+                    <span>EVENTS</span> <div class="icon-indicator"></div>
+                </button>
+                <button onclick="navigate('about')" id="btn-about" class="btn-retro">
+                    <span>PROTOCOL</span> <div class="icon-indicator"></div>
+                </button>
+            </nav>
 
-        <!-- Custom Music Player (Controls Hidden SoundCloud Widget) -->
-        <div class="retro-box p-1 mt-auto">
-            <div class="title-bar text-xs mb-1">
-                <span>WINAMP_V1.exe</span>
-            </div>
-            <div class="p-3 bg-[#222]">
-                <!-- LCD Display -->
-                <div class="retro-inset bg-[#9ea75a] p-2 mb-3 h-16 flex items-center justify-center relative overflow-hidden">
-                    <div id="track-info" class="font-[VT323] text-xl text-black w-full text-center truncate">
-                        LOADING...
-                    </div>
-                    <!-- Scanline on LCD -->
-                    <div class="absolute inset-0 bg-black opacity-10 pointer-events-none" style="background-size: 100% 2px;"></div>
+            <!-- 3. PLAYER MODULE -->
+            <div class="border-box p-4 bg-white mt-auto flex flex-col gap-3">
+                <div class="border-b-2 border-black pb-2 mb-1 flex justify-between">
+                    <span class="text-xs font-bold">AUDIO_CONTROLLER</span>
+                    <span id="player-status" class="text-xs text-red-600 blink">OFFLINE</span>
                 </div>
-
-                <!-- Tape Visual -->
-                <div class="flex justify-center gap-4 mb-3" id="tape-visual">
-                    <div class="w-8 h-8 rounded-full border-4 border-gray-600 relative tape-gear">
-                        <div class="absolute inset-0 border-2 border-white rounded-full border-dashed"></div>
-                    </div>
-                    <div class="w-20 h-8 bg-gray-800 rounded flex items-center justify-center">
-                        <div class="w-16 h-4 bg-black"></div>
-                    </div>
-                    <div class="w-8 h-8 rounded-full border-4 border-gray-600 relative tape-gear">
-                        <div class="absolute inset-0 border-2 border-white rounded-full border-dashed"></div>
-                    </div>
+                
+                <!-- Track Display -->
+                <div class="bg-black text-white p-2 font-mono text-sm overflow-hidden whitespace-nowrap">
+                    <span id="track-name">INITIALIZING WIDGET...</span>
                 </div>
 
                 <!-- Controls -->
-                <div class="flex justify-between gap-1">
-                    <button onclick="togglePlay()" class="retro-btn bg-gray-300 flex-1 font-bold text-xs">⏯ PLAY/PAUSE</button>
-                    <button onclick="nextTrack()" class="retro-btn bg-gray-300 px-3 font-bold text-xs">⏭</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="toggleAudio()" class="btn-retro justify-center text-center py-4 hover:bg-red-50">
+                        ⏯ PLAY
+                    </button>
+                    <button onclick="skipTrack()" class="btn-retro justify-center text-center py-4">
+                        ⏭ NEXT
+                    </button>
                 </div>
-                
-                <!-- Volume Slider -->
-                <div class="mt-2 flex items-center gap-2">
-                    <span class="text-white text-[10px]">VOL</span>
-                    <input type="range" min="0" max="100" value="80" class="w-full h-2 bg-gray-600 appearance-none outline-none overflow-hidden rounded-lg retro-inset" onchange="setVolume(this.value)">
+
+                <!-- Volume -->
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-xs font-bold">VOL</span>
+                    <input type="range" class="w-full h-2 bg-gray-200 appearance-none border border-black" oninput="setVolume(this.value)">
                 </div>
             </div>
-        </div>
+        </aside>
+
+        <!-- RIGHT COLUMN: CONTENT SCREEN -->
+        <main class="border-box bg-white flex-1 relative overflow-hidden flex flex-col">
+            
+            <!-- Window Header -->
+            <div class="bg-black text-white p-2 flex justify-between items-center text-sm font-bold sticky top-0 z-10">
+                <span id="screen-title">VIEWPORT: LIVE</span>
+                <span class="border border-white px-1 text-[10px]" id="clock">00:00</span>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div class="overflow-y-auto p-4 md:p-8 h-full scroll-hide relative" id="content-area">
+                
+                <!-- TAB: LIVE -->
+                <div id="view-live" class="view-section">
+                    <div class="border-2 border-dashed border-red-500 p-6 mb-8 bg-red-50">
+                        <h2 class="text-3xl md:text-5xl font-bold mb-2 uppercase">Current Broadcast</h2>
+                        <p class="text-sm font-bold text-red-600 mb-4">● TRANSMITTING FROM LONDON</p>
+                        <hr class="border-black mb-4">
+                        <p class="text-lg leading-relaxed">
+                            Welcome to the DEMOFM open frequency. We are currently aggregating audio signals from the <strong>Mat Guzzo</strong> archives.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border-box p-4">
+                            <h3 class="font-bold underline mb-2">CHAT LOG</h3>
+                            <ul class="text-sm space-y-1 font-mono text-gray-600">
+                                <li><span class="text-blue-600">USER_99:</span> Signal is strong today.</li>
+                                <li><span class="text-red-600">SYS_ADMIN:</span> Bitrate steady at 320kbps.</li>
+                                <li><span class="text-blue-600">GUEST:</span> ID on this track?</li>
+                            </ul>
+                        </div>
+                        <div class="border-box p-4 bg-black text-white flex flex-col justify-center items-center text-center">
+                            <div class="text-4xl font-bold mb-2">32</div>
+                            <div class="text-xs">LISTENERS CONNECTED</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: NEWS -->
+                <div id="view-news" class="view-section hidden">
+                    <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">DATA STREAM</h2>
+                    <div id="news-feed" class="flex flex-col gap-4">
+                        <!-- JS Will Inject Items Here -->
+                    </div>
+                </div>
+
+                <!-- TAB: EVENTS -->
+                <div id="view-events" class="view-section hidden">
+                     <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">UPCOMING</h2>
+                     
+                     <div class="flex flex-col gap-4">
+                        <!-- Event Card -->
+                        <div class="border-box p-0 flex flex-col md:flex-row">
+                            <div class="bg-black text-white p-4 flex flex-col justify-center items-center md:w-32">
+                                <span class="text-2xl font-bold">12</span>
+                                <span class="text-sm">DEC</span>
+                            </div>
+                            <div class="p-4 flex-1">
+                                <h3 class="text-xl font-bold">WAREHOUSE PROJECT 01</h3>
+                                <p class="text-sm text-gray-500">Location: Secret Location, LDN</p>
+                                <button class="mt-2 text-xs bg-red-600 text-white px-2 py-1 uppercase hover:bg-red-700">RSVP Closed</button>
+                            </div>
+                        </div>
+
+                        <!-- Event Card -->
+                        <div class="border-box p-0 flex flex-col md:flex-row">
+                            <div class="bg-white border-r-2 border-black text-black p-4 flex flex-col justify-center items-center md:w-32">
+                                <span class="text-2xl font-bold">05</span>
+                                <span class="text-sm">JAN</span>
+                            </div>
+                            <div class="p-4 flex-1">
+                                <h3 class="text-xl font-bold">ONLINE BROADCAST MARATHON</h3>
+                                <p class="text-sm text-gray-500">Location: Global Stream</p>
+                                <button class="mt-2 text-xs border border-black px-2 py-1 uppercase hover:bg-black hover:text-white">Remind Me</button>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- TAB: ABOUT -->
+                <div id="view-about" class="view-section hidden">
+                    <h2 class="text-4xl font-bold mb-6">SYS.PROTOCOL</h2>
+                    <div class="prose font-mono text-sm max-w-xl">
+                        <p class="mb-4">
+                            DEMOFM is a conceptual auditory interface designed for the post-internet era. We curate sounds that bridge the gap between digital coldness and analog warmth.
+                        </p>
+                        <p class="mb-4">
+                            <strong>OPERATOR:</strong> Mat Guzzo<br>
+                            <strong>VERSION:</strong> 3.0 (Stable)<br>
+                            <strong>LOCATION:</strong> Worldwide Web
+                        </p>
+                        <div class="border border-black p-4 bg-gray-100 mt-8">
+                            <p class="text-xs mb-2 font-bold">DEBUG INFO:</p>
+                            <p class="text-xs text-gray-500">
+                                RENDERER: HTML5/CANVAS<br>
+                                AUDIO: SC_API_V2<br>
+                                COLOR_MODE: HIGH_CONTRAST
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Log Footer -->
+            <div class="bg-gray-200 border-t-2 border-black p-1 text-[10px] font-mono flex gap-4 px-2">
+                <span>LOG:</span>
+                <span id="sys-log" class="text-gray-600">System Ready. Waiting for user input.</span>
+            </div>
+
+        </main>
     </div>
 
-    <!-- RIGHT COLUMN: Main Content Area -->
-    <div class="flex-1 retro-box p-1 flex flex-col h-full z-10 overflow-hidden">
-        <div class="title-bar text-xs">
-            <span>NETSCAPE NAVIGATOR</span>
-            <div class="flex gap-1">
-                <span class="bg-gray-300 text-black px-1 text-[10px] cursor-pointer">_</span>
-                <span class="bg-gray-300 text-black px-1 text-[10px] cursor-pointer">□</span>
-                <span class="bg-gray-300 text-black px-1 text-[10px] cursor-pointer">X</span>
-            </div>
-        </div>
-        
-        <!-- Address Bar decoration -->
-        <div class="bg-[#c0c0c0] p-2 border-b-2 border-gray-400 flex items-center gap-2">
-            <span class="text-sm">URL:</span>
-            <div class="retro-inset bg-white px-2 py-1 text-sm flex-1 font-[VT323]">http://www.demofm.online/index.html</div>
-        </div>
+    <!-- SOUNDCLOUD WIDGET (Hidden) -->
+    <!-- Attempting to load User Likes. If this fails, the 'onerror' logic isn't native to the iframe, so we rely on Widget API events -->
+    <iframe id="sc-widget" 
+            src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/matguzzo/likes&color=%23ff0000&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true" 
+            width="100%" 
+            height="166" 
+            scrolling="no" 
+            frameborder="no" 
+            allow="autoplay" 
+            style="display: none;">
+    </iframe>
 
-        <!-- Content Frame -->
-        <div class="retro-inset bg-white flex-1 p-6 overflow-y-auto relative">
-            
-            <!-- LIVE TAB -->
-            <div id="tab-live" class="content-tab">
-                <div class="border-2 border-black p-4 mb-6 bg-red-50">
-                    <h2 class="text-2xl font-bold font-[VT323] text-red-600 blink mb-2">● ON AIR NOW</h2>
-                    <p class="mb-4">Live broadcast from the Basement Studio.</p>
-                    <div class="w-full h-48 bg-black flex items-center justify-center relative overflow-hidden">
-                        <!-- CSS Visualizer Placeholder -->
-                        <div class="flex items-end gap-1 h-20">
-                            <div class="w-4 bg-green-400 h-full animate-pulse"></div>
-                            <div class="w-4 bg-green-400 h-1/2 animate-pulse" style="animation-delay: 0.1s"></div>
-                            <div class="w-4 bg-green-400 h-3/4 animate-pulse" style="animation-delay: 0.2s"></div>
-                            <div class="w-4 bg-green-400 h-full animate-pulse" style="animation-delay: 0.3s"></div>
-                            <div class="w-4 bg-green-400 h-1/4 animate-pulse" style="animation-delay: 0.4s"></div>
-                        </div>
-                        <div class="absolute top-2 right-2 text-white font-[VT323]">SIGNAL: 98%</div>
-                    </div>
+    <script>
+        // --- LOGGING UTILITY ---
+        function log(msg) {
+            const el = document.getElementById('sys-log');
+            el.innerText = `> ${msg}`;
+            console.log(msg);
+        }
+
+        // --- NAVIGATION ---
+        function navigate(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.btn-retro').forEach(el => el.classList.remove('active'));
+
+            // Show target
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            document.getElementById('btn-' + viewId).classList.add('active');
+
+            // Update Header
+            document.getElementById('screen-title').innerText = `VIEWPORT: ${viewId.toUpperCase()}`;
+            log(`Mapsd to ${viewId.toUpperCase()}`);
+        }
+
+        // --- NEWS FEED GENERATOR ---
+        const newsSources = [
+            { src: 'NEW MODELS', title: 'Why the internet feels smaller in 2024', date: 'TODAY' },
+            { src: 'RA.CO', title: 'Berlin clubs facing new zoning laws', date: 'YESTERDAY' },
+            { src: 'THE VERGE', title: 'Winamp releases open source code', date: '2 DAYS AGO' },
+            { src: 'DEMOFM', title: 'System maintenance complete.', date: '3 DAYS AGO' }
+        ];
+
+        const feedContainer = document.getElementById('news-feed');
+        newsSources.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'border-box p-4 hover:bg-gray-50 cursor-pointer transition';
+            div.innerHTML = `
+                <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
+                    <span class="text-red-600">${item.src}</span>
+                    <span>${item.date}</span>
                 </div>
-                <p class="text-sm font-bold">CURRENTLY SPINNING:</p>
-                <p class="text-lg font-[VT323]">POOLSUITE FM SUMMER HITS</p>
-                <hr class="border-black my-4">
-                <div class="bg-blue-100 p-4 border border-blue-300 text-sm">
-                    <strong>CHAT ROOM (3 Users):</strong>
-                    <div class="mt-2 font-[VT323]">
-                        <p><span class="text-blue-600">User1:</span> This track is absolute fire 🔥</p>
-                        <p><span class="text-purple-600">Admin:</span> Welcome to demoFM.</p>
-                        <p><span class="text-blue-600">Guest99:</span> Retro vibes only.</p>
-                    </div>
+                <h3 class="text-lg font-bold leading-tight">${item.title}</h3>
+            `;
+            feedContainer.appendChild(div);
+        });
+
+        // --- AUDIO ENGINE ---
+        var widgetIframe = document.getElementById('sc-widget');
+        var widget = SC.Widget(widgetIframe);
+        var isPlaying = false;
+
+        log("Initializing Audio Engine...");
+
+        widget.bind(SC.Widget.Events.READY, function() {
+            log("Audio Engine Connected.");
+            document.getElementById('track-name').innerText = "READY // PRESS PLAY";
+            document.getElementById('player-status').innerText = "STANDBY";
+            document.getElementById('player-status').classList.remove('blink');
+        });
+
+        widget.bind(SC.Widget.Events.PLAY, function() {
+            isPlaying = true;
+            document.getElementById('player-status').innerText = "PLAYING";
+            document.getElementById('player-status').classList.add('blink');
+            
+            widget.getCurrentSound(function(sound) {
+                if(sound) {
+                    let title = sound.title;
+                    if(title.length > 25) title = title.substring(0, 25) + "...";
+                    document.getElementById('track-name').innerText = title.toUpperCase();
+                    log(`Now Playing: ${title}`);
+                }
+            });
+        });
+
+        widget.bind(SC.Widget.Events.PAUSE, function() {
+            isPlaying = false;
+            document.getElementById('player-status').innerText = "PAUSED";
+            document.getElementById('player-status').classList.remove('blink');
+        });
+
+        function toggleAudio() {
+            if(!widget) return;
+            widget.toggle();
+        }
+
+        function skipTrack() {
+            if(!widget) return;
+            log("Skipping track...");
+            widget.next();
+        }
+
+        function setVolume(val) {
+            if(!widget) return;
+            widget.setVolume(val / 100);
+        }
+
+        // --- CLOCK ---
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = 
+                now.getHours().toString().padStart(2,'0') + ':' + 
+                now.getMinutes().toString().padStart(2,'0');
+        }, 1000);
+
+    </script>
+</body>
+</html>
