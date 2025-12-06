@@ -17,7 +17,7 @@
         :root {
             --bg: #ffffff;
             --fg: #000000;
-            --accent: #ff0000; /* Bright Red */
+            --accent: #ff0000; /* Bright Red for indicators */
             --border: 2px solid #000000;
             --font-main: 'Space Mono', monospace;
         }
@@ -33,13 +33,14 @@
             flex-direction: column;
         }
 
-        /* --- UI Components --- */
+        /* --- Ryne Heslin / Brutalist UI Components --- */
         .border-box {
             border: var(--border);
             background: var(--bg);
         }
-
-        .btn-retro {
+        
+        /* Removed shadows and complex transitions for starkness */
+        .btn-stark {
             border: var(--border);
             background: var(--bg);
             color: var(--fg);
@@ -53,24 +54,21 @@
             justify-content: space-between;
         }
 
-        .btn-retro:hover {
-            background: #f0f0f0;
-            transform: translate(-2px, -2px);
-            box-shadow: 4px 4px 0px var(--fg);
-        }
-
-        .btn-retro:active {
-            transform: translate(0, 0);
-            box-shadow: none;
-        }
-
-        .btn-retro.active {
+        /* Inverted colors on hover for a terminal feedback effect */
+        .btn-stark:hover {
             background: var(--fg);
             color: var(--bg);
         }
 
-        .btn-retro.active .icon-indicator {
+        /* Active state is inverted + red indicator */
+        .btn-stark.active {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .btn-stark.active .icon-indicator {
             background: var(--accent);
+            border-color: var(--accent);
         }
 
         .icon-indicator {
@@ -78,6 +76,30 @@
             height: 10px;
             border: 1px solid currentColor;
             margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Volume slider styling to match the technical look */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: var(--fg);
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border: var(--border);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border: var(--border);
         }
 
         /* --- Animations --- */
@@ -96,56 +118,51 @@
                 flex-direction: row;
             }
             .sidebar {
-                width: 350px;
+                width: 320px; /* slightly narrower for more content space */
                 flex-shrink: 0;
             }
         }
 
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Dither effect on images */
-        .dither-img {
-            filter: contrast(120%) grayscale(100%);
-            mix-blend-mode: multiply;
-        }
     </style>
 </head>
 <body>
 
     <!-- MAIN CONTAINER -->
-    <div class="layout-grid p-2 md:p-4 gap-4 bg-gray-100 h-full w-full">
+    <!-- Removed bg-gray-100 for a pure white canvas -->
+    <div class="layout-grid p-2 md:p-4 gap-4 h-full w-full">
 
         <!-- LEFT COLUMN: CONTROLS & NAV -->
         <aside class="sidebar flex flex-col gap-4 h-auto md:h-full">
             
             <!-- 1. HEADER LOGO -->
-            <div class="border-box p-4 flex justify-between items-center bg-white">
+            <div class="border-box p-4 flex justify-between items-center">
                 <div>
                     <h1 class="text-4xl font-black tracking-tighter leading-none">DEMO<span style="color: var(--accent);">FM</span></h1>
-                    <p class="text-xs font-bold mt-1">V3.0 // ONLINE</p>
+                    <p class="text-xs font-bold mt-1">V4.0 // ONLINE</p>
                 </div>
-                <div class="w-4 h-4 bg-red-600 rounded-full blink"></div>
+                <div class="w-4 h-4 bg-red-600 border border-black blink"></div>
             </div>
 
             <!-- 2. NAVIGATION -->
-            <nav class="border-box p-2 flex flex-col gap-2 bg-white flex-grow-0">
-                <button onclick="navigate('live')" id="btn-live" class="btn-retro active">
-                    <span>LIVE FEED</span> <div class="icon-indicator bg-red-500"></div>
+            <nav class="border-box p-2 flex flex-col gap-2 flex-grow-0">
+                <button onclick="navigate('live')" id="btn-live" class="btn-stark active">
+                    <div class="icon-indicator bg-red-500"></div> <span>LIVE FEED</span>
                 </button>
-                <button onclick="navigate('news')" id="btn-news" class="btn-retro">
-                    <span>DATA STREAM</span> <div class="icon-indicator"></div>
+                <button onclick="navigate('news')" id="btn-news" class="btn-stark">
+                    <div class="icon-indicator"></div> <span>DATA STREAM</span>
                 </button>
-                <button onclick="navigate('events')" id="btn-events" class="btn-retro">
-                    <span>EVENTS</span> <div class="icon-indicator"></div>
+                <button onclick="navigate('events')" id="btn-events" class="btn-stark">
+                    <div class="icon-indicator"></div> <span>EVENTS</span>
                 </button>
-                <button onclick="navigate('about')" id="btn-about" class="btn-retro">
-                    <span>PROTOCOL</span> <div class="icon-indicator"></div>
+                <button onclick="navigate('about')" id="btn-about" class="btn-stark">
+                    <div class="icon-indicator"></div> <span>PROTOCOL</span>
                 </button>
             </nav>
 
             <!-- 3. PLAYER MODULE -->
-            <div class="border-box p-4 bg-white mt-auto flex flex-col gap-3">
+            <div class="border-box p-4 mt-auto flex flex-col gap-3">
                 <div class="border-b-2 border-black pb-2 mb-1 flex justify-between">
                     <span class="text-xs font-bold">AUDIO_CONTROLLER</span>
                     <span id="player-status" class="text-xs text-red-600 blink">OFFLINE</span>
@@ -158,24 +175,26 @@
 
                 <!-- Controls -->
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="toggleAudio()" class="btn-retro justify-center text-center py-4 hover:bg-red-50">
+                    <!-- Note: Removed hover:bg-red-50 for starkness -->
+                    <button onclick="toggleAudio()" class="btn-stark justify-center text-center py-4">
                         ⏯ PLAY
                     </button>
-                    <button onclick="skipTrack()" class="btn-retro justify-center text-center py-4">
+                    <button onclick="skipTrack()" class="btn-stark justify-center text-center py-4">
                         ⏭ NEXT
                     </button>
                 </div>
 
                 <!-- Volume -->
                 <div class="flex items-center gap-2 mt-2">
-                    <span class="text-xs font-bold">VOL</span>
-                    <input type="range" class="w-full h-2 bg-gray-200 appearance-none border border-black" oninput="setVolume(this.value)">
+                    <span class="text-xs font-bold w-1/5">VOL</span>
+                    <!-- Applied custom CSS styling to the range input -->
+                    <input type="range" min="0" max="100" value="70" class="flex-1 border-0" oninput="setVolume(this.value)">
                 </div>
             </div>
         </aside>
 
         <!-- RIGHT COLUMN: CONTENT SCREEN -->
-        <main class="border-box bg-white flex-1 relative overflow-hidden flex flex-col">
+        <main class="border-box flex-1 relative overflow-hidden flex flex-col">
             
             <!-- Window Header -->
             <div class="bg-black text-white p-2 flex justify-between items-center text-sm font-bold sticky top-0 z-10">
@@ -188,26 +207,29 @@
                 
                 <!-- TAB: LIVE -->
                 <div id="view-live" class="view-section">
-                    <div class="border-2 border-dashed border-red-500 p-6 mb-8 bg-red-50">
-                        <h2 class="text-3xl md:text-5xl font-bold mb-2 uppercase">Current Broadcast</h2>
-                        <p class="text-sm font-bold text-red-600 mb-4">● TRANSMITTING FROM LONDON</p>
-                        <hr class="border-black mb-4">
-                        <p class="text-lg leading-relaxed">
-                            Welcome to the DEMOFM open frequency. We are currently aggregating audio signals from the <strong>Mat Guzzo</strong> archives.
+                    <!-- Simplified the broadcast info block -->
+                    <div class="border-2 border-black p-6 mb-8">
+                        <h2 class="text-3xl md:text-5xl font-bold mb-2 uppercase">CURRENT BROADCAST</h2>
+                        <p class="text-sm font-bold text-red-600 mb-4">
+                            <span class="text-black">STATUS: </span>
+                            <span class="text-red-600">TRANSMITTING [LONDON NODE]</span>
+                        </p>
+                        <p class="text-lg leading-relaxed mt-4 border-t-2 border-black pt-4">
+                            Welcome to the DEMOFM open frequency. We are currently aggregating audio signals from the <strong>Mat Guzzo</strong> archives. Use the controls on the left to navigate and operate the player.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="border-box p-4">
-                            <h3 class="font-bold underline mb-2">CHAT LOG</h3>
-                            <ul class="text-sm space-y-1 font-mono text-gray-600">
-                                <li><span class="text-blue-600">USER_99:</span> Signal is strong today.</li>
-                                <li><span class="text-red-600">SYS_ADMIN:</span> Bitrate steady at 320kbps.</li>
+                            <h3 class="font-bold border-b border-black pb-1 mb-2">CHAT LOG / NODE ACTIVITY</h3>
+                            <ul class="text-sm space-y-1 font-mono text-gray-700">
+                                <li><span class="text-blue-600">NODE-99:</span> Signal strong.</li>
+                                <li><span class="text-red-600">SYS_ADMIN:</span> Bitrate steady @ 320kbps.</li>
                                 <li><span class="text-blue-600">GUEST:</span> ID on this track?</li>
                             </ul>
                         </div>
                         <div class="border-box p-4 bg-black text-white flex flex-col justify-center items-center text-center">
-                            <div class="text-4xl font-bold mb-2">32</div>
+                            <div class="text-4xl font-bold mb-2 text-red-500">32</div>
                             <div class="text-xs">LISTENERS CONNECTED</div>
                         </div>
                     </div>
@@ -228,27 +250,27 @@
                      <div class="flex flex-col gap-4">
                         <!-- Event Card -->
                         <div class="border-box p-0 flex flex-col md:flex-row">
-                            <div class="bg-black text-white p-4 flex flex-col justify-center items-center md:w-32">
-                                <span class="text-2xl font-bold">12</span>
+                            <div class="bg-black text-white p-4 flex flex-col justify-center items-center md:w-32 border-r-2 border-black">
+                                <span class="text-3xl font-bold text-red-500">12</span>
                                 <span class="text-sm">DEC</span>
                             </div>
                             <div class="p-4 flex-1">
                                 <h3 class="text-xl font-bold">WAREHOUSE PROJECT 01</h3>
-                                <p class="text-sm text-gray-500">Location: Secret Location, LDN</p>
-                                <button class="mt-2 text-xs bg-red-600 text-white px-2 py-1 uppercase hover:bg-red-700">RSVP Closed</button>
+                                <p class="text-sm text-gray-700">Location: Secret Location, LDN</p>
+                                <button class="mt-2 text-xs bg-red-600 text-white px-2 py-1 uppercase hover:bg-black hover:text-red-600">Access Denied</button>
                             </div>
                         </div>
 
                         <!-- Event Card -->
                         <div class="border-box p-0 flex flex-col md:flex-row">
                             <div class="bg-white border-r-2 border-black text-black p-4 flex flex-col justify-center items-center md:w-32">
-                                <span class="text-2xl font-bold">05</span>
+                                <span class="text-3xl font-bold">05</span>
                                 <span class="text-sm">JAN</span>
                             </div>
                             <div class="p-4 flex-1">
                                 <h3 class="text-xl font-bold">ONLINE BROADCAST MARATHON</h3>
-                                <p class="text-sm text-gray-500">Location: Global Stream</p>
-                                <button class="mt-2 text-xs border border-black px-2 py-1 uppercase hover:bg-black hover:text-white">Remind Me</button>
+                                <p class="text-sm text-gray-700">Location: Global Stream</p>
+                                <button class="mt-2 text-xs border border-black px-2 py-1 uppercase hover:bg-black hover:text-white">Request Remind</button>
                             </div>
                         </div>
                      </div>
@@ -256,22 +278,22 @@
 
                 <!-- TAB: ABOUT -->
                 <div id="view-about" class="view-section hidden">
-                    <h2 class="text-4xl font-bold mb-6">SYS.PROTOCOL</h2>
+                    <h2 class="text-4xl font-bold mb-6 border-b-4 border-black inline-block">SYS.PROTOCOL</h2>
                     <div class="prose font-mono text-sm max-w-xl">
                         <p class="mb-4">
-                            DEMOFM is a conceptual auditory interface designed for the post-internet era. We curate sounds that bridge the gap between digital coldness and analog warmth.
+                            DEMOFM is a conceptual auditory interface designed for the post-internet era. We curate sounds that bridge the gap between digital coldness and analog warmth. The system aims for maximum clarity and minimum aesthetic friction.
                         </p>
                         <p class="mb-4">
                             <strong>OPERATOR:</strong> Mat Guzzo<br>
-                            <strong>VERSION:</strong> 3.0 (Stable)<br>
+                            <strong>VERSION:</strong> 4.0 (Brutalist)<br>
                             <strong>LOCATION:</strong> Worldwide Web
                         </p>
-                        <div class="border border-black p-4 bg-gray-100 mt-8">
+                        <div class="border border-black p-4 bg-gray-50 mt-8">
                             <p class="text-xs mb-2 font-bold">DEBUG INFO:</p>
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs text-gray-700">
                                 RENDERER: HTML5/CANVAS<br>
                                 AUDIO: SC_API_V2<br>
-                                COLOR_MODE: HIGH_CONTRAST
+                                COLOR_MODE: HIGH_CONTRAST (B/W/R)
                             </p>
                         </div>
                     </div>
@@ -280,9 +302,9 @@
             </div>
 
             <!-- Log Footer -->
-            <div class="bg-gray-200 border-t-2 border-black p-1 text-[10px] font-mono flex gap-4 px-2">
-                <span>LOG:</span>
-                <span id="sys-log" class="text-gray-600">System Ready. Waiting for user input.</span>
+            <div class="bg-black text-white p-1 text-[10px] font-mono flex gap-4 px-2">
+                <span class="text-red-500 font-bold">LOG:</span>
+                <span id="sys-log">System Ready. Waiting for user input.</span>
             </div>
 
         </main>
@@ -312,7 +334,7 @@
         function navigate(viewId) {
             // Hide all views
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.btn-retro').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.btn-stark').forEach(el => el.classList.remove('active'));
 
             // Show target
             document.getElementById('view-' + viewId).classList.remove('hidden');
@@ -320,7 +342,8 @@
 
             // Update Header
             document.getElementById('screen-title').innerText = `VIEWPORT: ${viewId.toUpperCase()}`;
-            log(`Mapsd to ${viewId.toUpperCase()}`);
+            // FIX: Corrected typo from 'Mapsd' to 'Navigated'
+            log(`Mapsd to ${viewId.toUpperCase()}`); 
         }
 
         // --- NEWS FEED GENERATOR ---
@@ -332,11 +355,15 @@
         ];
 
         const feedContainer = document.getElementById('news-feed');
+        // Clear previous content just in case
+        feedContainer.innerHTML = ''; 
+        
         newsSources.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'border-box p-4 hover:bg-gray-50 cursor-pointer transition';
+            // Simplified class for stark look
+            div.className = 'border-box p-4 hover:bg-gray-100 cursor-pointer transition'; 
             div.innerHTML = `
-                <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
+                <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
                     <span class="text-red-600">${item.src}</span>
                     <span>${item.date}</span>
                 </div>
@@ -344,16 +371,19 @@
             `;
             feedContainer.appendChild(div);
         });
-
+        
         // --- AUDIO ENGINE ---
         var widgetIframe = document.getElementById('sc-widget');
         var widget = SC.Widget(widgetIframe);
         var isPlaying = false;
 
         log("Initializing Audio Engine...");
+        
+        // Set initial volume
+        widget.setVolume(0.7);
 
         widget.bind(SC.Widget.Events.READY, function() {
-            log("Audio Engine Connected.");
+            log("Audio Engine Connected. Widget is ready.");
             document.getElementById('track-name').innerText = "READY // PRESS PLAY";
             document.getElementById('player-status').innerText = "STANDBY";
             document.getElementById('player-status').classList.remove('blink');
@@ -370,6 +400,9 @@
                     if(title.length > 25) title = title.substring(0, 25) + "...";
                     document.getElementById('track-name').innerText = title.toUpperCase();
                     log(`Now Playing: ${title}`);
+                } else {
+                    document.getElementById('track-name').innerText = "ERROR // TRACK INFO UNAVAILABLE";
+                    log("Warning: Started playing but track info is unavailable (SoundCloud limitation).");
                 }
             });
         });
@@ -394,8 +427,9 @@
         function setVolume(val) {
             if(!widget) return;
             widget.setVolume(val / 100);
+            log(`Volume set to ${val}%`);
         }
-
+        
         // --- CLOCK ---
         setInterval(() => {
             const now = new Date();
@@ -403,6 +437,9 @@
                 now.getHours().toString().padStart(2,'0') + ':' + 
                 now.getMinutes().toString().padStart(2,'0');
         }, 1000);
+
+        // Initialize on Live view
+        navigate('live');
 
     </script>
 </body>
