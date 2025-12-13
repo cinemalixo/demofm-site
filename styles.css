@@ -1,7 +1,7 @@
 :root {
-  --bg: #f7f7f5;
+  --bg: #f5f5f2;
   --fg: #111;
-  --muted: #777;
+  --muted: #666;
   --accent: #ff5c5c;
 }
 
@@ -9,20 +9,34 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
-  font-family: Inter, system-ui, sans-serif;
+  height: 100%;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--fg);
 }
 
-/* LOADING */
+/* === MOVING DITHER LAYER === */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
+  background-size: 200px 200px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === LOADING === */
 #loading {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
   background: var(--bg);
+  z-index: 2;
 }
 
 .loading-inner {
@@ -31,41 +45,44 @@ body {
 
 .loading-inner h1 {
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.2em;
 }
 
 #enter {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.6rem;
   border: 1px solid var(--fg);
   background: transparent;
   font-size: 1rem;
 }
 
-/* APP */
+/* === APP === */
+#app {
+  position: relative;
+  z-index: 1;
+}
+
 header {
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
-}
-
-.logo {
-  font-weight: 600;
+  padding: 1rem 1.5rem;
+  font-size: 0.9rem;
 }
 
 .status {
   color: var(--accent);
 }
 
+/* === PLAYER === */
 .player {
   display: grid;
   place-items: center;
-  padding: 3rem 1rem;
+  padding: 4rem 1rem 3rem;
 }
 
 .player button {
   font-size: 1.2rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.8rem 2rem;
   border: none;
   background: var(--fg);
   color: var(--bg);
@@ -75,18 +92,21 @@ header {
   margin-top: 1rem;
   text-align: center;
   color: var(--muted);
+  font-size: 0.9rem;
 }
 
+/* === PANELS === */
 .panels {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-  padding: 2rem 1rem;
+  gap: 2.5rem;
+  padding: 2rem 1.5rem 3rem;
 }
 
 .panel h2 {
   font-weight: 400;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .panel ul {
@@ -95,12 +115,23 @@ header {
 }
 
 .panel li {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
   font-size: 0.95rem;
+}
+
+.panel a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.panel a:hover {
+  text-decoration: underline;
 }
 
 @media (min-width: 768px) {
   .panels {
     grid-template-columns: 1fr 1fr;
+    max-width: 900px;
+    margin: 0 auto;
   }
 }
