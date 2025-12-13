@@ -1,1 +1,106 @@
-a
+:root {
+  --bg: #f7f7f5;
+  --fg: #111;
+  --muted: #777;
+  --accent: #ff5c5c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* LOADING */
+#loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+
+.loading-inner {
+  text-align: center;
+}
+
+.loading-inner h1 {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+#enter {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--fg);
+  background: transparent;
+  font-size: 1rem;
+}
+
+/* APP */
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.logo {
+  font-weight: 600;
+}
+
+.status {
+  color: var(--accent);
+}
+
+.player {
+  display: grid;
+  place-items: center;
+  padding: 3rem 1rem;
+}
+
+.player button {
+  font-size: 1.2rem;
+  padding: 0.8rem 1.6rem;
+  border: none;
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.track {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.panel h2 {
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.panel li {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+  .panels {
+    grid-template-columns: 1fr 1fr;
+  }
+}
